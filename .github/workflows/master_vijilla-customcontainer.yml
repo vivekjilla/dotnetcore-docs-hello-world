@@ -31,7 +31,7 @@ jobs:
       with:
         push: true
         tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_47f70629a3024e079cc9646db3b63d29 }}/vivekjilla/cc-sample:${{ github.sha }}
-        file: ./Dockerfile
+        file: ./Dockerfile.linux
 
   deploy:
     runs-on: ubuntu-latest
