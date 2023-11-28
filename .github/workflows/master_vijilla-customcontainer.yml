@@ -31,7 +31,7 @@ jobs:
       with:
         push: true
         tags: vijillacustomcontainers.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_578de10fa1dc4dcdb0c846e5c67befff }}/cc-sample:${{ github.sha }}
-        file: ./Dockerfile
+        file: ./Dockerfile.linux
 
   deploy:
     runs-on: ubuntu-latest
