@@ -1,0 +1,51 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - vijilla-customcontainer
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to registry
+      uses: docker/login-action@v2
+      with:
+        registry: https://vijillacustomcontainers.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_578de10fa1dc4dcdb0c846e5c67befff }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_d9e3bf7cef4f4517ab019d8e4648c893 }}
+
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: vijillacustomcontainers.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_578de10fa1dc4dcdb0c846e5c67befff }}/cc-sample:${{ github.sha }}
+        file: ./Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'vijilla-customcontainer'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_db8d567ea39f4bc1a901b0d27202a711 }}
+        images: 'vijillacustomcontainers.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_578de10fa1dc4dcdb0c846e5c67befff }}/cc-sample:${{ github.sha }}'
